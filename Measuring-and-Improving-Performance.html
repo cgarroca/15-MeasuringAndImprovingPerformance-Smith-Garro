@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Carmen Garro and Luke Smith" />
+
+
+<title>Measuring and Improving Performance</title>
+
+<script src="Measuring-and-Improving-Performance_files/header-attrs-2.16/header-attrs.js"></script>
+<script src="Measuring-and-Improving-Performance_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Measuring-and-Improving-Performance_files/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="Measuring-and-Improving-Performance_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Measuring-and-Improving-Performance_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Measuring-and-Improving-Performance_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="Measuring-and-Improving-Performance_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="Measuring-and-Improving-Performance_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="Measuring-and-Improving-Performance_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="Measuring-and-Improving-Performance_files/navigation-1.1/tabsets.js"></script>
+<link href="Measuring-and-Improving-Performance_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="Measuring-and-Improving-Performance_files/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="Measuring-and-Improving-Performance_files/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="Measuring-and-Improving-Performance_files/d3-3.5.6/d3.min.js"></script>
+<link href="Measuring-and-Improving-Performance_files/profvis-0.3.6.9000/profvis.css" rel="stylesheet" />
+<script src="Measuring-and-Improving-Performance_files/profvis-0.3.6.9000/profvis.js"></script>
+<script src="Measuring-and-Improving-Performance_files/profvis-0.3.6.9000/scroll.js"></script>
+<link href="Measuring-and-Improving-Performance_files/highlight-6.2.0/textmate.css" rel="stylesheet" />
+<script src="Measuring-and-Improving-Performance_files/highlight-6.2.0/highlight.js"></script>
+<script src="Measuring-and-Improving-Performance_files/profvis-binding-0.3.7/profvis.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="custom.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Measuring and Improving Performance</h1>
+<h4 class="author">Carmen Garro and Luke Smith</h4>
+<h4 class="date">2022-16-11</h4>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This material is mainly based on the chapters 23 and 24 of Hadley
+Wickham’s book <a
+href="http://adv-r.had.co.nz/Performance.html">Advanced R</a></p>
+<div id="what-is-performance" class="section level2">
+<h2>What is performance?</h2>
+<p>The performance of a code is how quickly a computer can perform a
+task given certain code. The performance of a code depends on how fast
+and how many resources are needed for a computational task to be done.
+It is a balance between deciding the point of efficiency for the code,
+and how many hours have to be dedicated from the person for this
+efficiency to be reached.</p>
+</div>
+<div id="is-r-an-efficient-language" class="section level2">
+<h2>Is R an efficient language?</h2>
+<p><img
+src="performance-chart-langs.png" /></p>
+<p>R is a language designed to make analytics easier for people, it was
+not designed with efficiency in mind. This chart is composed by the time
+it takes for different coding languages to multiply two matrices of
+dimensions 1000x1000. R is evidently the slowest in the list.</p>
+</div>
+<div id="why-is-improving-performance-important" class="section level2">
+<h2>Why is improving performance important?</h2>
+<p>There are various reasons for improving performance, specially
+nowadays with so many tools in hand and the data science and computer
+science fields broadening.</p>
+<ul>
+<li>The less efficient the code, the more time it takes processing data
+i.e., reduce bottlenecks in your code</li>
+<li>Less memory usage</li>
+<li>CO2 emissions from energy usage with high intensity computing</li>
+</ul>
+</div>
+<div id="environmental-considerations" class="section level2">
+<h2>Environmental considerations</h2>
+<p>When considering the importance of measuring and improving the
+performance of your code, it is important to be aware of the
+environmental aspects associated with intense computing. In a paper
+titled, “Aligning artificial intelligence with climate change
+mitigation”, from Lynn Kaack, an Assistant Professor of Computer Science
+and Public Policy at the Hertie School, this is discussed in detail.</p>
+<p>The vast majority of models that have been employed so far in our
+program are relatively small and their environmental impact incredibly
+minimal. However, as we seek to become data scientists working at
+potentially large organizations, it becomes more likely that we will
+engage with increasingly complex models that utilize a large amount of
+computing power, and therefore, a large amount of electricity. Professor
+Kaack highlights neural network models, and the training stage of model
+development in particular, as a very energy intensive process given the
+high number of potential model configurations and trial and error
+continuing to be the most effective way to configure the model.Specific
+company examples noted in the paper include:</p>
+<ul>
+<li>Google’s machine translation system may process more than 100
+billion words per day.</li>
+<li>Facebook’s datacenters are re-trained anywhere from hourly to
+multi-monthly.</li>
+</ul>
+<p><img
+src="pic%20for%20IDS.png" /></p>
+<p>While it is still not standard practice to consider the environmental
+impact of machine learning, it will becoming increasingly relevant as AI
+and machine learning continue to increase in prevalence. While measuring
+and improving performance will not singlehandedly address environmental
+concerns, it is a small yet important step in ensuring that your code is
+as efficient as possible. Not just to reduce the time it takes to run,
+but to minimize the amount of energy utilized to run it.</p>
+</div>
+</div>
+<div id="measuring-performance" class="section level1">
+<h1>Measuring performance</h1>
+<p>Find what could make your code faster first, these are called
+<strong>bottlenecks</strong>. Don’t rely on intuition, rely on your code
+<strong>profile</strong>, measure the run-time of each line of code
+using realistic inputs.</p>
+<p>Once these bottleneck are found, you can experiment with alternatives
+to find faster code.</p>
+<p>Steps:</p>
+<ul>
+<li>Dig into what is making the code slower with a profile, with the
+<strong>profvis</strong> package</li>
+<li>Use microbenchmark from the <strong>banch</strong> package to
+explore alternative implementations and which one is faster</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(profvis)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bench)</span></code></pre></div>
+<div id="profiling-from-profvis-package" class="section level2">
+<h2>Profiling (from profvis package)</h2>
+<p>A profiler is the primary tool used across programming languages. R
+uses a sampling or statistical profiler: it stops the execution of code
+every few milliseconds and records the call stack (i.e. which function
+is currently executing, and the function that called the function, and
+so on).</p>
+</div>
+<div id="benchmark-from-bench-package" class="section level2">
+<h2>Benchmark (from bench package)</h2>
+<p>This library is a tool to accurately analyze and benchmark execution
+times for R expressions.</p>
+<p><a
+href="https://github.com/r-lib/bench">https://github.com/r-lib/bench</a></p>
+<p>Features:</p>
+<ul>
+<li>Always uses the highest precision APIs available for each operating
+systems (often nanoseconds)</li>
+<li>Tracks memory allocations for each expression</li>
+<li>Tracks the number and type of R garbage collections per expression
+iteration</li>
+<li>Verifies equality of expression results by default, to avoid
+accidentally benchmarking inequivalent code</li>
+<li>Uses adaptive stopping by default, running each expression for a set
+amount of time rather than for a specific number of iterations</li>
+<li>Expressions are sun in batches and summary statistics are calculated
+after filtering out iterations with garbage collections. This allows you
+to isolate the performance and effects of garbage collection on running
+time</li>
+<li>The time and memory usage are returned as custom objects which have
+human readable formatting for display and comparisons.</li>
+<li>There is also support for plotting with ggplot2, including custom
+scales.</li>
+</ul>
+</div>
+<div id="visualizing-profiles" class="section level2">
+<h2>Visualizing profiles</h2>
+<p>Even if your function takes a few seconds it will generate hundreds
+of samples. We use the package <strong>profvis</strong> to visualize
+aggregates.</p>
+<p>Ways to use profvis</p>
+<ul>
+<li>From the Profile menu in RStudio</li>
+<li>With profvis::profvis().</li>
+</ul>
+<p>Here are some of the functions the class of Introduction for Data
+Science of the year 2020 did for an assignment. These functions had to
+calculate the share of coincidence of votes between two countries after
+a given year.</p>
+<p>These are the packages needed for the functions to properly work.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Packages specifically for the example functions to work properly</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(countrycode)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unvotes)</span></code></pre></div>
+<details>
+<summary>
+Click for syntax of function 1
+</summary>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># even code</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Rodrigo&#39;s function</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>votes_agreement_calculator_1 <span class="ot">&lt;-</span> <span class="cf">function</span>(country_code_1, country_code_2, year_min) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># get the data</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  un_votes <span class="ot">&lt;-</span> unvotes<span class="sc">::</span>un_votes</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  un_votes_rc <span class="ot">&lt;-</span> unvotes<span class="sc">::</span>un_roll_calls</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># for debuggin purpouses only</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># print(paste(country_code_1, country_code_2, year_min))</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># make sure the arguments are right</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># there&#39;s no voting before the UN exists in 1945 nor after the current year</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.numeric</span>(year_min) <span class="sc">|</span> year_min <span class="sc">&lt;</span> <span class="dv">1945</span> <span class="sc">|</span> year_min <span class="sc">&gt;</span> lubridate<span class="sc">::</span><span class="fu">year</span>(<span class="fu">Sys.Date</span>())) {</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span> (<span class="st">&quot;year_min: invalid value&quot;</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># check if the country_code exists </span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>country_code_1 <span class="sc">%in%</span> un_votes<span class="sc">$</span>country_code <span class="sc">|</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span>country_code_2 <span class="sc">%in%</span> un_votes<span class="sc">$</span>country_code) {</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span> (<span class="st">&quot;country_code: invalide value&quot;</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># passing the checkings, keep working</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clean the rol call base</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  un_votes_rc_clean <span class="ot">&lt;-</span> un_votes_rc <span class="sc">|&gt;</span> </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>      <span class="co"># get the year of each votation</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(date)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the necessary columns only</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(rcid, session, year) </span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># merge votes with rol call (to get year)</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  un_votes_merged <span class="ot">&lt;-</span> un_votes <span class="sc">|&gt;</span> </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># joining with roll call database cleaned</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">left_join</span>(un_votes_rc_clean, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;=</span> year_min <span class="sc">&amp;</span> </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>                    country_code <span class="sc">%in%</span> <span class="fu">c</span>(country_code_1, country_code_2)) </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  <span class="do">## check if there is any country with 0 rows</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if there aren&#39;t 2 countries, return NA</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  <span class="co"># I did this because some country_codes were breking the code, and I prefer to do this check inside the function to make it more robust</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  count_countries <span class="ot">&lt;-</span> <span class="fu">unique</span>(un_votes_merged<span class="sc">$</span>country_code) <span class="sc">|&gt;</span> </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>() <span class="co"># how many countries are there?</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(count_countries <span class="sc">!=</span> <span class="dv">2</span>) {</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="fu">paste</span>(<span class="st">&quot;Warning:&quot;</span>, country_code_1, <span class="st">&quot;and&quot;</span>, country_code_2, <span class="st">&quot;since&quot;</span>,</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>                  year_min, <span class="st">&quot;has&quot;</span>, count_countries, <span class="st">&quot;values. It must have 2. Skiping this country.&quot;</span>))</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># pivot to be able to compare country_code_1 and country_code_2</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>  votes_comparable <span class="ot">&lt;-</span> un_votes_merged <span class="sc">|&gt;</span> </span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>session, <span class="sc">-</span>country) <span class="sc">|&gt;</span> </span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> country_code, </span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>                       <span class="at">values_from =</span> vote) <span class="sc">|&gt;</span> </span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># rename columns to make it easier to generalize</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="st">&quot;country_1&quot;</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">&quot;country_2&quot;</span> <span class="ot">=</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(country_1) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(country_2))</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># group_by year, then count how many lines country_1 == country_2</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> votes_comparable <span class="sc">|&gt;</span> </span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>      <span class="at">equal =</span> country_1 <span class="sc">==</span> country_2</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(year) <span class="sc">|&gt;</span> </span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>, <span class="co"># dropping to do another summarise</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>                     <span class="at">agreed =</span> <span class="fu">sum</span>(equal)  </span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mean</span>(agreed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">pull</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.numeric</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="dv">2</span>)</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(result)</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</details>
+<details>
+<summary>
+Click for syntax of function 2
+</summary>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Alvaro&#39;s function</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>votes_agreement_calculator_2 <span class="ot">&lt;-</span> <span class="cf">function</span>(country1, country2, <span class="at">year_min =</span> <span class="st">&quot;2000-01-01&quot;</span>){</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  join <span class="ot">&lt;-</span> <span class="fu">left_join</span>(un_votes, un_roll_calls, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  c1 <span class="ot">&lt;-</span> join <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(date <span class="sc">&gt;=</span> year_min, country_code <span class="sc">%in%</span> country1) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(rcid, country, country_code, vote, session, date) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">c1vote =</span> vote)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  c2 <span class="ot">&lt;-</span> join <span class="sc">%&gt;%</span> </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(date <span class="sc">&gt;=</span> year_min, country_code <span class="sc">%in%</span> country2) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(rcid, country, country_code, vote, session, date) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">c2vote =</span> vote)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  c1c2 <span class="ot">&lt;-</span> <span class="fu">full_join</span>(c1,c2, <span class="at">by=</span><span class="st">&quot;rcid&quot;</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  c1c2 <span class="ot">&lt;-</span> c1c2 <span class="sc">%&gt;%</span> </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">agreed =</span> <span class="fu">if_else</span>(c1cote <span class="sc">==</span> c2vote,<span class="dv">1</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(agreed))</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  total <span class="ot">&lt;-</span> <span class="fu">count</span>(c1c2, agreed)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  c1c2ag <span class="ot">&lt;-</span> total[<span class="dv">2</span>,<span class="dv">2</span>]</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">round</span>(c1c2ag<span class="sc">/</span><span class="fu">sum</span>(total[<span class="st">&quot;n&quot;</span>],<span class="at">digits =</span> <span class="dv">2</span>)<span class="sc">*</span><span class="dv">100</span>))</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</details>
+<details>
+<summary>
+Click for syntax of function 3
+</summary>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Ben&#39;s function</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create votes_agreement_calculator function</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>votes_agreement_calculator_3 <span class="ot">&lt;-</span> <span class="cf">function</span>(ccode_a, ccode_b, year_min){</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create joined data set with necessary columns; create year column from date column; select relevant variables; discard NAs in country_code, filter rows for country a and country b</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  un <span class="ot">&lt;-</span> un_votes <span class="sc">%&gt;%</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(un_roll_calls, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">format</span>(date,<span class="st">&quot;%Y&quot;</span>), <span class="at">date =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(rcid, country_code, vote, year) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(country_code)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(country_code <span class="sc">%in%</span> <span class="fu">c</span>(ccode_a, ccode_b))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Pivot countries as columns and take values from the respective voting decision</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  un_votes_wide <span class="ot">&lt;-</span> un <span class="sc">%&gt;%</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&quot;country_code&quot;</span>, <span class="at">values_from =</span> <span class="st">&quot;vote&quot;</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate agreement_share between ccode_a and ccode_b b since year_min</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  agreement_share <span class="ot">&lt;-</span> un_votes_wide <span class="sc">%&gt;%</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">agreement =</span> un_votes_wide[ccode_a] <span class="sc">==</span> un_votes_wide[ccode_b]) <span class="sc">%&gt;%</span> <span class="co">#add agreement column</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">&gt;=</span> year_min, <span class="sc">!</span><span class="fu">is.na</span>(agreement)) <span class="sc">%&gt;%</span> <span class="co">#discard NAs in agreement variable</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">agreement_share =</span> <span class="fu">mean</span>(agreement))<span class="sc">%&gt;%</span> <span class="co">#calculate mean() of agreement variable</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.numeric</span>() <span class="co">#convert to numeric</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(agreement_share)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Agreement rate for the United States and Russia for votes cast in 2000 and later</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co">#votes_agreement_calculator_3(&quot;US&quot;, &quot;RU&quot;, 2000)</span></span></code></pre></div>
+</details>
+<details>
+<summary>
+Click for syntax of function 4
+</summary>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Luke&#39;s function</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>votes_agreement_calculator_4 <span class="ot">&lt;-</span> <span class="cf">function</span>(country_1, country_2, year_min) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Here we pull in the necessary data frames directly from the &#39;unvotes&#39; package, assuming that the above code may not have been run yet</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  un_joined_func <span class="ot">&lt;-</span> un_votes <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(un_roll_calls, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="at">year =</span> <span class="fu">year</span>(date), country)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Here we create a data frame specifically for country_1 and rename their &quot;vote&quot; column accordingly</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  df_1 <span class="ot">&lt;-</span> un_joined_func <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(country <span class="sc">%in%</span> country_1, year <span class="sc">&gt;=</span> year_min) <span class="sc">%&gt;%</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">country_1_vote =</span> vote)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#We create a second data frame here for country_2 that does the same as above</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  df_2 <span class="ot">&lt;-</span> un_joined_func <span class="sc">%&gt;%</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(country <span class="sc">%in%</span> country_2, year <span class="sc">&gt;=</span> year_min) <span class="sc">%&gt;%</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">country_2_vote =</span> vote)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Now, we merge these two new data frames into one so that we can compare their newly named vote columns</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    joined_dfs <span class="ot">&lt;-</span> df_1 <span class="sc">%&gt;%</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(df_2, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Below, we count the number of times that the two countries agree with each other in the UN</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  country_vote_agreement <span class="ot">&lt;-</span> <span class="fu">count</span>(joined_dfs, country_1_vote <span class="sc">==</span> country_2_vote)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Now we take the average and round it down to three decimal places</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  average_country_vote_agreement <span class="ot">&lt;-</span>   <span class="fu">round</span>((country_vote_agreement<span class="sc">$</span>n[<span class="dv">2</span>]<span class="sc">/</span>(country_vote_agreement<span class="sc">$</span>n[<span class="dv">1</span>]<span class="sc">+</span>country_vote_agreement<span class="sc">$</span>n[<span class="dv">2</span>])), <span class="at">digits=</span><span class="dv">3</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Lastly, we create a list including the two countries&#39; names and how often they voted with each other</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  returned_list <span class="ot">&lt;-</span> <span class="fu">c</span>(country_1, country_2, average_country_vote_agreement)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(average_country_vote_agreement)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</details>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">profvis</span>({</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">votes_agreement_calculator_1</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="dv">2000</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">votes_agreement_calculator_2</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="dv">2000</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">votes_agreement_calculator_3</span>(<span class="st">&quot;US&quot;</span>,<span class="st">&quot;RU&quot;</span>,<span class="st">&quot;2000-01-01&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">votes_agreement_calculator_4</span>(<span class="st">&quot;Russia&quot;</span>, <span class="st">&quot;United States&quot;</span>, <span class="dv">2000</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<div id="htmlwidget-db4f934beccd12e67e7a" style="width:100%;height:600px;" class="profvis html-widget"></div>
+<script type="application/json" data-for="htmlwidget-db4f934beccd12e67e7a">{"x":{"message":{"prof":{"time":[1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,6,6,7,7,8,8,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18,19,19,19,20,20,21,21,22,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29,30,30,31,31,32,32,33,33,34,34,35,35,36,36,37,37,38,38,39,39,39,39,40,40,40,41,41,42,42,42,42,42,42,43,43,43,43,43,43,44,44,44,44,44,44,45,45,45,45,45,45,45,46,46,46,46,46,47,47,47,47,47,47,48,48,48,48,48,49,49,49,49,49,49,50,50,50,50,50,50,51,51,51,51,51,51,52,52,52,52,52,52,53,53,53,53,53,53,54,54,54,54,54,54,55,55,55,55,55,55,56,56,56,56,56,56,57,57,57,57,57,57,57,57,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,58,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,61,61,62,62,63,63,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,64,65,65,65,65,65,65,65,65,65,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,70,70,70,70,70,70,71,71,71,71,71,71,72,72,72,72,72,72,73,73,73,73,73,74,74,74,74,74,74,75,75,75,75,75,75,76,76,76,76,76,77,77,77,77,77,77,77,78,78,78,78,78,79,79,79,79,79,80,80,80,80,80,80,81,81,81,81,81,82,82,82,82,82,82,83,83,83,83,83,83,84,84,84,84,84,84,85,85,85,85,85,85,86,86,86,86,86,86,87,87,87,87,87,87,88,88,88,88,88,88,89,89,89,89,89,89,90,90,90,90,90,90,91,91,91,91,91,91,92,92,92,92,92,93,93,93,93,93,94,94,94,94,94,95,95,96,96,97,97,98,98,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,100,100,101,101,102,102,103,103,103,103,104,104,104,104,104,104,104,105,105,105,105,105,105,105,105,106,106,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,110,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,111,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,113,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,114,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,115,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,116,117,117,117,117,117,117,117,117,117,117,117,117,117,117,117,117,117,117,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119,119],"depth":[13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,13,12,11,10,9,8,7,6,5,4,3,2,1,2,1,2,1,2,1,2,1,2,1,3,2,1,3,2,1,3,2,1,3,2,1,3,2,1,3,2,1,3,2,1,3,2,1,3,2,1,3,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,4,3,2,1,3,2,1,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,7,6,5,4,3,2,1,5,4,3,2,1,6,5,4,3,2,1,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,8,7,6,5,4,3,2,1,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,2,1,2,1,2,1,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,9,8,7,6,5,4,3,2,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,5,4,3,2,1,7,6,5,4,3,2,1,5,4,3,2,1,5,4,3,2,1,6,5,4,3,2,1,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,6,5,4,3,2,1,5,4,3,2,1,5,4,3,2,1,5,4,3,2,1,2,1,2,1,2,1,2,1,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,2,1,2,1,2,1,4,3,2,1,7,6,5,4,3,2,1,8,7,6,5,4,3,2,1,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1],"label":["findCenvVar","getInlineInfo","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","exists","findCenvVar","getInlineInfo","isBaseVar","getFoldFun","constantFoldCall","constantFold","cmp","cmpPrim2","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","findCenvVar","getInlineInfo","isBaseVar","getFoldFun","constantFoldCall","constantFold","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","cmpPrim2","h","tryInline","cmpCall","cmp","genCode","cmpCallArgs","cmpCallExprFun","cmpCall","cmp","cmpSymbolAssign","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","%in%","getFoldFun","constantFoldCall","constantFold","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","<GC>","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","<GC>","%in%","votes_agreement_calculator_1","rmarkdown::render","%in%","votes_agreement_calculator_1","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","vec_match","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","lengths","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","unlist","index_flatten","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_1","rmarkdown::render","names2","endots","enquos","dplyr_quosures","filter_rows","filter.data.frame","votes_agreement_calculator_1","rmarkdown::render","make.argContext","h","tryInline","cmpCall","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","cmpSymbolAssign","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","expr_interp","$.r6lite","args_deparse","deparser","sexp_deparse","deparser","method","lines$deparse","operand_deparse","binary_op_deparse","deparser","op_deparse","deparser","sexp_deparse","deparser","method","lines$deparse","operand_deparse","binary_op_deparse","deparser","op_deparse","deparser","sexp_deparse","quo_deparse","expr_deparse","infix_overflows","FUN","vapply",".rlang_purrr_map_mold","map_chr","exprs_auto_name","rlang:::quos_auto_name","rmarkdown::render","expr_interp","$.r6lite","deparser","sexp_deparse","deparser","method","lines$deparse","args_deparse","deparser","sexp_deparse","deparser","method","lines$deparse","operand_deparse","binary_op_deparse","deparser","op_deparse","deparser","sexp_deparse","quo_deparse","expr_deparse","as_label_infix","FUN","vapply",".rlang_purrr_map_mold","map_chr","exprs_auto_name","rlang:::quos_auto_name","rmarkdown::render",".Call","rmarkdown::render",".Call","rmarkdown::render",".Call","rmarkdown::render","rlang::is_string","check_string","line_push","method","self$push_one","method","lines$push","deparser","sexp_deparse","deparser","method","lines$deparse","deparser","sexp_deparse","deparser","method","lines$deparse","deparser","op_deparse","deparser","sexp_deparse","deparser","method","lines$deparse","operand_deparse","binary_op_deparse","deparser","op_deparse","deparser","sexp_deparse","quo_deparse","expr_deparse","infix_overflows","FUN","vapply",".rlang_purrr_map_mold","map_chr","exprs_auto_name","rlang:::quos_auto_name","rmarkdown::render","new_vctr","new_list_of","group_data.data.frame","group_vars.data.frame","tbl_vars","group_by_prepare","group_by.data.frame","votes_agreement_calculator_1","rmarkdown::render","anyDuplicated","validate_unique","<Anonymous>","vec_as_names","repaired_names","set_repaired_names","lst_to_tibble","as_tibble.data.frame","group_data.tbl_df","group_rows","initialize","DataMask$new","summarise_cols","summarise.data.frame","votes_agreement_calculator_1","rmarkdown::render","cb$putcode","cmpSym","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","cmpSymbolAssign","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","%in%","getFoldFun","constantFoldCall","constantFold","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","genCode","cmpCallArgs","cmpCallSymFun","cmpCall","cmp","cmpSymbolAssign","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","cb$setcurexpr","cmp","cmpSymbolAssign","h","tryInline","cmpCall","cmp","h","tryInline","cmpCall","cmp","genCode","cmpfun","compiler:::tryCmpfun","rmarkdown::render","vec_match","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_match","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_match","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","lengths","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","unlist","index_flatten","join_rows","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","<GC>","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render","vec_slice","join_mutate","left_join.data.frame","votes_agreement_calculator_2","rmarkdown::render",".Call","rmarkdown::render","%in%","rmarkdown::render",".Call","rmarkdown::render","c","rmarkdown::render","%||%","line_push","method","self$push_one","method","lines$push","deparser","sexp_deparse","deparser","method","lines$deparse","operand_deparse","binary_op_deparse","deparser","op_deparse","deparser","sexp_deparse","quo_deparse","expr_deparse","infix_overflows","FUN","vapply",".rlang_purrr_map_mold","map_chr","exprs_auto_name","rlang:::quos_auto_name","rmarkdown::render","%in%","rmarkdown::render","%in%","rmarkdown::render","%in%","rmarkdown::render","vec_slice","dplyr_row_slice.data.frame","filter.data.frame","rmarkdown::render","$","vars_select_eval","eval_select_impl","rename_impl","tidyselect::eval_rename","rename.data.frame","rmarkdown::render",".p","detect_index","trace_find_bottom","trace_back","abort","h",".handleSimpleError","rmarkdown::render","lazyLoadDBfetch","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","Sys.sleep","callRemote","callFun","rstudioapi::getThemeInfo","get_rstudio_theme","detect_dark_theme","builtin_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render",".deparseOpts","deparse","mode","deparse","deparse1","as.data.frame.character","data.frame","theme_create","clii_add_theme","app$add_theme","clii_init","app$new","cliapp","start_app","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","FUN","lapply","base::strwrap","ansi_strwrap","clii__xtext","app$xtext","clii_text","app$text","FUN","lapply","clii_bullets","<Anonymous>","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","FUN","vapply","vlapply","clii__container_end","FUN","lapply","clii_bullets","<Anonymous>","cli__fmt","cli_fmt","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","detect_new","rstudio$detect","rstudio_detect","get_rstudio_fg_color0","get_rstudio_fg_color","update_rstudio_color","cli_format",".rlang_cli_format","cli_format","cnd_message_format","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","<Anonymous>","get_parentpid","detect_new","rstudio$detect","console_width","clii__get_width","app$get_width","clii__xtext","app$xtext","clii_text","app$text","FUN","lapply","clii_bullets","<Anonymous>","cli__fmt","cli_fmt","cli::format_message",".rlang_cli_format_inline","format_code","format_error_call","cnd_message_format_prefixed","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render","<Anonymous>","get_parentpid","detect_new","rstudio$detect","rstudio_detect","get_rstudio_fg_color0","get_rstudio_fg_color","update_rstudio_color","cli::format_message",".rlang_cli_format_inline","format_code","format_error_call","cnd_message_format_prefixed","cnd_message","conditionMessage.rlang_error","signalCondition","signal_abort","abort","h",".handleSimpleError","rmarkdown::render"],"filenum":[null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,1,null,null,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,1,null,null,null,null,1,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"linenum":[null,null,null,null,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,3,null,null,3,null,null,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,null,3,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,3,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,4,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,4,null,null,null,null,null,null,null,null,null,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,4,null,null,null,null,null,null,4,null,null,null,null,4,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,null,4,null,null,null,null,4,null,null,null,null,4,null,null,null,null,4,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"memalloc":[14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.4512710571289,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.5593338012695,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.6893463134766,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,14.8528442382812,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,47.1438217163086,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5952606201172,46.5950698852539,46.5950698852539,46.5950698852539,78.4209289550781,78.4209289550781,85.0590286254883,85.0590286254883,91.6966705322266,91.6966705322266,91.6976165771484,91.6976165771484,91.6979141235352,91.6979141235352,91.6979675292969,91.6979675292969,91.6981353759766,91.6981353759766,91.6981430053711,91.6981430053711,91.6986236572266,91.6986236572266,91.6986694335938,91.6986694335938,91.6986846923828,91.6986846923828,98.3361740112305,98.3361740112305,98.3366851806641,98.3366851806641,98.3369369506836,98.3369369506836,98.3370895385742,98.3370895385742,98.3371963500977,98.3371963500977,98.3372039794922,98.3372039794922,103.520515441895,103.520515441895,105.708419799805,105.708419799805,106.538047790527,106.538047790527,106.538047790527,106.538047790527,84.5027160644531,84.5027160644531,84.5027160644531,87.0130004882812,87.0130004882812,94.8233642578125,94.8233642578125,94.8233642578125,94.8233642578125,94.8233642578125,94.8233642578125,104.779083251953,104.779083251953,104.779083251953,104.779083251953,104.779083251953,104.779083251953,111.41618347168,111.41618347168,111.41618347168,111.41618347168,111.41618347168,111.41618347168,85.2156982421875,85.2156982421875,85.2156982421875,85.2156982421875,85.2156982421875,85.2156982421875,85.2156982421875,101.809867858887,101.809867858887,101.809867858887,101.809867858887,101.809867858887,108.443168640137,108.443168640137,108.443168640137,108.443168640137,108.443168640137,108.443168640137,108.324981689453,108.324981689453,108.324981689453,108.324981689453,108.324981689453,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,108.325035095215,76.0555191040039,76.0555191040039,76.0555191040039,76.0555191040039,76.0555191040039,76.0555191040039,82.8920974731445,82.8920974731445,82.8920974731445,82.8920974731445,82.8920974731445,82.8920974731445,82.8920974731445,82.8920974731445,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.5156784057617,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.7764358520508,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,83.8905334472656,90.675407409668,90.675407409668,110.586791992188,110.586791992188,114.646781921387,114.646781921387,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.414962768555,115.791618347168,115.791618347168,115.791618347168,115.791618347168,115.791618347168,115.791618347168,115.791618347168,115.791618347168,115.791618347168,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.293365478516,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.573776245117,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.658042907715,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,116.808349609375,120.620300292969,120.620300292969,120.620300292969,120.620300292969,120.620300292969,120.620300292969,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,123.938850402832,130.575950622559,130.575950622559,130.575950622559,130.575950622559,130.575950622559,133.894569396973,133.894569396973,133.894569396973,133.894569396973,133.894569396973,133.894569396973,116.486869812012,116.486869812012,116.486869812012,116.486869812012,116.486869812012,116.486869812012,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,103.4013671875,119.995903015137,119.995903015137,119.995903015137,119.995903015137,119.995903015137,126.63304901123,126.63304901123,126.63304901123,126.63304901123,126.63304901123,129.951866149902,129.951866149902,129.951866149902,129.951866149902,129.951866149902,129.951866149902,119.875953674316,119.875953674316,119.875953674316,119.875953674316,119.875953674316,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,129.831756591797,86.4419326782227,86.4419326782227,86.4419326782227,86.4419326782227,86.4419326782227,86.4419326782227,93.0790252685547,93.0790252685547,93.0790252685547,93.0790252685547,93.0790252685547,106.353378295898,106.353378295898,106.353378295898,106.353378295898,106.353378295898,112.990524291992,112.990524291992,112.990524291992,112.990524291992,112.990524291992,119.674667358398,119.674667358398,132.954788208008,132.954788208008,139.591911315918,139.591911315918,139.964134216309,139.964134216309,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,140.07447052002,156.697891235352,156.697891235352,160.016456604004,160.016456604004,126.458160400391,126.458160400391,129.795799255371,129.795799255371,129.795799255371,129.795799255371,130.229972839355,130.229972839355,130.229972839355,130.229972839355,130.229972839355,130.229972839355,130.229972839355,131.885177612305,131.885177612305,131.885177612305,131.885177612305,131.885177612305,131.885177612305,131.885177612305,131.885177612305,132.474159240723,132.474159240723,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,132.860305786133,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.082954406738,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.588401794434,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.753196716309,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,133.81453704834,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.234397888184,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355,134.255363464355],"meminc":[0,0,0,0,0,0,0,0,0,0,0,0,0,0.108062744140625,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.130012512207031,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.163497924804688,0,0,0,0,0,0,0,0,0,0,0,0,32.2909774780273,0,0,0,0,0,0,0,0,0,-0.548561096191406,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.00019073486328125,0,0,31.8258590698242,0,6.63809967041016,0,6.63764190673828,0,0.000946044921875,0,0.00029754638671875,0,5.340576171875e-05,0,0.0001678466796875,0,7.62939453125e-06,0,0.00048065185546875,0,4.57763671875e-05,0,1.52587890625e-05,0,6.63748931884766,0,0.00051116943359375,0,0.00025177001953125,0,0.000152587890625,0,0.0001068115234375,0,7.62939453125e-06,0,5.18331146240234,0,2.18790435791016,0,0.829627990722656,0,0,0,-22.0353317260742,0,0,2.51028442382812,0,7.81036376953125,0,0,0,0,0,9.95571899414062,0,0,0,0,0,6.63710021972656,0,0,0,0,0,-26.2004852294922,0,0,0,0,0,0,16.5941696166992,0,0,0,0,6.63330078125,0,0,0,0,0,-0.118186950683594,0,0,0,0,5.340576171875e-05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-32.2695159912109,0,0,0,0,0,6.83657836914062,0,0,0,0,0,0,0,0.623580932617188,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.260757446289062,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.114097595214844,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6.78487396240234,0,19.9113845825195,0,4.05998992919922,0,0.768180847167969,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.376655578613281,0,0,0,0,0,0,0,0,0.501747131347656,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.280410766601562,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0842666625976562,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.150306701660156,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3.81195068359375,0,0,0,0,0,3.31855010986328,0,0,0,0,0,0,0,0,0,0,0,6.63710021972656,0,0,0,0,3.31861877441406,0,0,0,0,0,-17.4076995849609,0,0,0,0,0,-13.0855026245117,0,0,0,0,0,0,0,0,0,0,0,16.5945358276367,0,0,0,0,6.63714599609375,0,0,0,0,3.31881713867188,0,0,0,0,0,-10.0759124755859,0,0,0,0,9.95580291748047,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-43.3898239135742,0,0,0,0,0,6.63709259033203,0,0,0,0,13.2743530273438,0,0,0,0,6.63714599609375,0,0,0,0,6.68414306640625,0,13.2801208496094,0,6.63712310791016,0,0.372222900390625,0,0.110336303710938,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16.623420715332,0,3.31856536865234,0,-33.5582962036133,0,3.33763885498047,0,0,0,0.434173583984375,0,0,0,0,0,0,1.65520477294922,0,0,0,0,0,0,0,0.588981628417969,0,0.386146545410156,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.222648620605469,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.505447387695312,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.164794921875,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.06134033203125,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.41986083984375,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.020965576171875,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"filename":[null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,"<expr>",null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,"<expr>",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},"interval":10,"files":[{"filename":"<expr>","content":"\nprofvis({\n  votes_agreement_calculator_1(\"US\", \"RU\", 2000)\n  votes_agreement_calculator_2(\"US\", \"RU\", 2000)\n  votes_agreement_calculator_3(\"US\",\"RU\",\"2000-01-01\")\n  votes_agreement_calculator_4(\"Russia\", \"United States\", 2000)\n})","normpath":"<expr>"}],"prof_output":"C:\\Users\\carme\\AppData\\Local\\Temp\\RtmpyiqI7T\\file49482a60c30.prof","highlight":{"output":["^output\\$"],"gc":["^<GC>$"],"stacktrace":["^\\.\\.stacktraceo(n|ff)\\.\\.$"]},"split":"h"}},"evals":[],"jsHooks":[]}</script>
+<p>Vis output shows the source code, overlaid with bar graphs for memory
+and execution time for each line of code.</p>
+<p>Best practice: store code in a separate file and source()ing it in;
+this will ensure you get the best connection between profiling data and
+source code.</p>
+<p>The bottom pane displays a flame graph showing the full call stack.
+It allows to see when objects are called more than one time. This is
+also displayed in the data tab, which let’s you zoom interactively.</p>
+<p>R will give this output once we run the profiling function. On the
+top panel, we can see the memory allocated to each function. In this
+case, two of the functions are significantly higher in memory and time
+than the two others. In the bottom panel, we can see the elements of the
+functions, the time they took to run, and the garbage collector in
+grey.</p>
+</div>
+<div id="memory-profiling" class="section level2">
+<h2>Memory profiling</h2>
+<p>The special entry <GC> indicates that the garbage collector is
+running. If it’s taking a lot of time, it means there are a lot of
+short-lived objects. When this happens, check the memory column and look
+which lines are taking a lot of memory(the bar on the right) and
+freed(the bar on the left).</p>
+<p><strong>Limitations</strong></p>
+<ul>
+<li>Profiling doesn’t extend to C code. You can see if your R code calls
+C/C++ code but not what functions are called inside of your C/C++
+code.</li>
+<li>If there are many anonymous functions, it is hard to identify which
+is the function being called. It is better to name the functions.</li>
+<li>R’s profiler doesn’t store enough information to disentangle lazy
+evaluation.</li>
+</ul>
+</div>
+<div id="microbenching" class="section level2">
+<h2>Microbenching</h2>
+<p>A <strong>microbenchmark</strong> is a measurement of the performance
+of a very small piece of code. They are useful for comparing small
+snippets of code for specific tasks. Be very careful of generalizing:
+the observed differences in microbenchmarks will typically be dominated
+by higher-order effects in real code; a deep understanding of
+subatommics physics is not very helpful when baking.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bench)</span></code></pre></div>
+<p>By default, bench::mark() runs each expression at least once
+(min_iterations = 1), and at most enough times to take 0.5 s (min_time =
+0.5). It checks that each run returns the same value which is typically
+what you want microbenchmarking.</p>
+<p><strong>Results</strong></p>
+<p>bench::mark() returns the results as a tibble, with one row for each
+input expression, and the following columns:</p>
+<ul>
+<li><p>min, mean, median, mex, and itr/sec. These summarise the time
+taken by the expression. Focus on the minimum (best possible running
+time) and the median (the typical time).</p></li>
+<li><p>mem_alloc tells you the amount of memory allocated by the first
+run, and n_gc() tells you the total number of garbage collections over
+all runs. These are useful for assessing the memory usage of the
+expression.</p></li>
+<li><p>n_itr and total_time tells you how many times the expression was
+evaluated and how long that took in total. n_itr will always be greater
+than the min_iteration parameter, and total_time will always be greater
+than the min_time parameter</p></li>
+<li><p>result, memory, tie and gc are list-columns that store the raw
+underlying data</p></li>
+</ul>
+<p>You can call them with []</p>
+<p><strong>Interpreting results</strong></p>
+<p>Pay attention to the units. It is useful to know how many times a
+function needs to run before it takes a second. If a microbenchmark
+takes:</p>
+<ul>
+<li>1 ms, then one thousand calls take a second</li>
+<li>1 micros, then one million calls take a second</li>
+<li>1 nanos, then one billion calls take a second</li>
+</ul>
+</div>
+</div>
+<div id="improving-performance" class="section level1">
+<h1>Improving Performance</h1>
+<p>The process of improving the performance of your code can be a
+daunting task initially as the solution can take many different
+potential forms. Four approaches to improving the performance of your
+code include:</p>
+<ul>
+<li>Code organization</li>
+<li>Checking for existing solutions</li>
+<li>Have your function do as little work as possible</li>
+<li>Vectorize your code</li>
+</ul>
+<div id="code-organization" class="section level2">
+<h2>Code Organization</h2>
+<p>One approach to improving the performance of your code is to compare
+the speed of different functions that accomplish the same goal. To
+illustrate this, the code below shows different functions that were
+utilized to show how often two countries voted with each other in the
+United Nations. We will see which of them is the most efficient.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#First, we will install and load the necessary package, bench, which will allow us to compare the performance of small self-contained code chunks</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Package for measuring and improving the performance of code</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bench)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Packages specifically for the example functions to work properly</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(countrycode)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unvotes)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Problem Set Functions</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Function #1</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create votes_agreement_calculator function</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>function_1 <span class="ot">&lt;-</span> <span class="cf">function</span>(ccode_a, ccode_b, year_min){</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create joined data set with necessary columns; create year column from date column; select relevant variables; discard NAs in country_code, filter rows for country a and country b</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  un <span class="ot">&lt;-</span> un_votes <span class="sc">%&gt;%</span> </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(un_roll_calls, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">format</span>(date,<span class="st">&quot;%Y&quot;</span>), <span class="at">date =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(rcid, country_code, vote, year) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(country_code)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(country_code <span class="sc">%in%</span> <span class="fu">c</span>(ccode_a, ccode_b))</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Pivot countries as columns and take values from the respective voting decision</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  un_votes_wide <span class="ot">&lt;-</span> un <span class="sc">%&gt;%</span> </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&quot;country_code&quot;</span>, <span class="at">values_from =</span> <span class="st">&quot;vote&quot;</span>)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate agreement_share between ccode_a and ccode_b b since year_min</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  agreement_share <span class="ot">&lt;-</span> un_votes_wide <span class="sc">%&gt;%</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">agreement =</span> un_votes_wide[ccode_a] <span class="sc">==</span> un_votes_wide[ccode_b]) <span class="sc">%&gt;%</span> <span class="co">#add agreement column</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(year <span class="sc">&gt;=</span> year_min, <span class="sc">!</span><span class="fu">is.na</span>(agreement)) <span class="sc">%&gt;%</span> <span class="co">#discard NAs in agreement variable</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">agreement_share =</span> <span class="fu">mean</span>(agreement))<span class="sc">%&gt;%</span> <span class="co">#calculate mean() of agreement variable</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.numeric</span>() <span class="co">#convert to numeric</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">round</span>(agreement_share, <span class="at">digits =</span> <span class="dv">3</span>))</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">#Function #2</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>function_2 <span class="ot">&lt;-</span> <span class="cf">function</span>(country_1, country_2, year_min) {</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Here we pull in the necessary data frames directly from the &#39;unvotes&#39; package, assuming that the above code may not have been run yet</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>  un_joined_func <span class="ot">&lt;-</span> un_votes <span class="sc">%&gt;%</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(un_roll_calls, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="at">year =</span> <span class="fu">year</span>(date), country)</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Here we create a data frame specifically for country_1 and rename their &quot;vote&quot; column accordingly</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>  df_1 <span class="ot">&lt;-</span> un_joined_func <span class="sc">%&gt;%</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(country <span class="sc">%in%</span> country_1, year <span class="sc">&gt;=</span> year_min) <span class="sc">%&gt;%</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">country_1_vote =</span> vote)</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>  <span class="co">#We create a second data frame here for country_2 that does the same as above</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>  df_2 <span class="ot">&lt;-</span> un_joined_func <span class="sc">%&gt;%</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(country <span class="sc">%in%</span> country_2, year <span class="sc">&gt;=</span> year_min) <span class="sc">%&gt;%</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">country_2_vote =</span> vote)</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Now, we merge these two new data frames into one so that we can compare their newly named vote columns</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    joined_dfs <span class="ot">&lt;-</span> df_1 <span class="sc">%&gt;%</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(df_2, <span class="at">by =</span> <span class="st">&quot;rcid&quot;</span>)</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Below, we count the number of times that the two countries agree with each other in the UN</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>  country_vote_agreement <span class="ot">&lt;-</span> <span class="fu">count</span>(joined_dfs, country_1_vote <span class="sc">==</span> country_2_vote)</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Now we take the average and round it down to three decimal places</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>  average_country_vote_agreement <span class="ot">&lt;-</span>   <span class="fu">round</span>((country_vote_agreement<span class="sc">$</span>n[<span class="dv">2</span>]<span class="sc">/</span>(country_vote_agreement<span class="sc">$</span>n[<span class="dv">1</span>]<span class="sc">+</span>country_vote_agreement<span class="sc">$</span>n[<span class="dv">2</span>])), <span class="at">digits=</span><span class="dv">3</span>)</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Lastly, we create a list including the two countries&#39; names and how often they voted with each other</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>  returned_list <span class="ot">&lt;-</span> <span class="fu">c</span>(country_1, country_2, average_country_vote_agreement)</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(average_country_vote_agreement)</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="co">#Here we will compare the functions provided above</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>bench<span class="sc">::</span><span class="fu">mark</span>(</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">function_1</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="dv">2000</span>),</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">function_2</span>(<span class="st">&quot;Russia&quot;</span>, <span class="st">&quot;United States&quot;</span>, <span class="dv">2000</span>)</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 6
+##   expression                                       min   median itr/se…¹ mem_a…²
+##   &lt;bch:expr&gt;                                  &lt;bch:tm&gt; &lt;bch:tm&gt;    &lt;dbl&gt; &lt;bch:b&gt;
+## 1 function_1(&quot;US&quot;, &quot;RU&quot;, 2000)                   9.28s    9.28s    0.108   234MB
+## 2 function_2(&quot;Russia&quot;, &quot;United States&quot;, 2000)    2.13s    2.13s    0.470   242MB
+## # … with 1 more variable: `gc/sec` &lt;dbl&gt;, and abbreviated variable names
+## #   ¹​`itr/sec`, ²​mem_alloc</code></pre>
+<p>After observing the results, we can see that Function #2 takes less
+time to run than Function #1. Additionally, less memory is utilized by
+Function #1</p>
+</div>
+<div id="checking-for-exisiting-solutions" class="section level2">
+<h2>Checking for exisiting solutions</h2>
+<p>After your have exhausted your own solutions, it is helpful to
+consult outside resources to see if the issue has been encountered
+before since it very likely has been. Potential options could
+include:</p>
+<ul>
+<li>rseek at <a href="https://rseek.org/"
+class="uri">https://rseek.org/</a></li>
+<li>stackoverflow at <a href="https://stackoverflow.com/"
+class="uri">https://stackoverflow.com/</a></li>
+<li>CRAN Task Views at <a href="https://cran.rstudio.com/web/views/"
+class="uri">https://cran.rstudio.com/web/views/</a></li>
+<li>Seeking input from fellow students, professors, colleagues,
+etc.</li>
+</ul>
+</div>
+<div id="have-your-function-do-as-little-work-as-possible"
+class="section level2">
+<h2>Have your function do as little work as possible</h2>
+<p>When choosing (premade) functions, try to make it to as little work
+as possible. This means choosing a function which will accomplish your
+desired goal while using the least amount of effort. Intuitively knowing
+which functions are faster than others requires a high level of
+familiarity with R code. Some common items to note include:</p>
+<ul>
+<li>readr::read_csv() is significantly faster than read.csv()</li>
+<li>rowSums(), colSums(), rowMeans(), and colMeans() are faster than
+equivalent invocations that use apply() because they are vectorised</li>
+</ul>
+</div>
+<div id="vectorize-your-code" class="section level2">
+<h2>Vectorize your code</h2>
+<p>Vectorizing your code can be a very powerful tool in reducing its run
+time. By utilizing vectorized functions, you can insure that the
+function is being applied to the entire vector at the same time, rather
+than one at a time as with a non-vectorized function. The example below
+illustrates this with an example that multiplies vectors.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Microbenchmark returns summaries from the test</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(microbenchmark)</span></code></pre></div>
+<pre><code>## Warning: package &#39;microbenchmark&#39; was built under R version 4.2.2</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Function (vectorized) that multiplies two vectors. </span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>vectorized_vector <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>n</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">&lt;-</span> x <span class="sc">*</span> x</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(y)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Function (non-vectorized) that multiplies two vectors</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>vector_for_loop <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>n</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="at">length =</span> n)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        y[i] <span class="ot">&lt;-</span> x[i] <span class="sc">*</span> x[i]</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(y)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="fu">microbenchmark</span>(<span class="fu">vectorized_vector</span>(<span class="dv">100</span>),</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>               <span class="fu">vector_for_loop</span>(<span class="dv">100</span>),</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>               <span class="at">times =</span> <span class="dv">100</span>)</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["expr"],"name":[1],"type":["fct"],"align":["left"]},{"label":["time"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"vectorized_vector(100)","2":"92200"},{"1":"vector_for_loop(100)","2":"16371800"},{"1":"vector_for_loop(100)","2":"40700"},{"1":"vector_for_loop(100)","2":"38600"},{"1":"vector_for_loop(100)","2":"38200"},{"1":"vectorized_vector(100)","2":"6712200"},{"1":"vectorized_vector(100)","2":"5400"},{"1":"vector_for_loop(100)","2":"47000"},{"1":"vectorized_vector(100)","2":"3900"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vector_for_loop(100)","2":"39200"},{"1":"vector_for_loop(100)","2":"39700"},{"1":"vector_for_loop(100)","2":"39400"},{"1":"vector_for_loop(100)","2":"39200"},{"1":"vector_for_loop(100)","2":"38500"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"39500"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vector_for_loop(100)","2":"38800"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vector_for_loop(100)","2":"39400"},{"1":"vector_for_loop(100)","2":"41800"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"40900"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vectorized_vector(100)","2":"4200"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vector_for_loop(100)","2":"41000"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"42800"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vectorized_vector(100)","2":"4000"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41900"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"43700"},{"1":"vectorized_vector(100)","2":"4100"},{"1":"vector_for_loop(100)","2":"41900"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vectorized_vector(100)","2":"3800"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"42000"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vectorized_vector(100)","2":"5100"},{"1":"vector_for_loop(100)","2":"42200"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3700"},{"1":"vectorized_vector(100)","2":"3700"},{"1":"vector_for_loop(100)","2":"43300"},{"1":"vector_for_loop(100)","2":"42300"},{"1":"vectorized_vector(100)","2":"3900"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vector_for_loop(100)","2":"40800"},{"1":"vectorized_vector(100)","2":"3800"},{"1":"vectorized_vector(100)","2":"3800"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"42700"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vector_for_loop(100)","2":"45300"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vectorized_vector(100)","2":"3700"},{"1":"vector_for_loop(100)","2":"40900"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"4100"},{"1":"vector_for_loop(100)","2":"41800"},{"1":"vectorized_vector(100)","2":"3600"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41700"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41700"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vector_for_loop(100)","2":"42500"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"41700"},{"1":"vector_for_loop(100)","2":"42200"},{"1":"vector_for_loop(100)","2":"45800"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vector_for_loop(100)","2":"41400"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vectorized_vector(100)","2":"4100"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vectorized_vector(100)","2":"3700"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vector_for_loop(100)","2":"41000"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41300"},{"1":"vectorized_vector(100)","2":"3300"},{"1":"vector_for_loop(100)","2":"41700"},{"1":"vectorized_vector(100)","2":"3500"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vector_for_loop(100)","2":"41800"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vector_for_loop(100)","2":"41100"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3800"},{"1":"vector_for_loop(100)","2":"41500"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vector_for_loop(100)","2":"41200"},{"1":"vectorized_vector(100)","2":"3600"},{"1":"vector_for_loop(100)","2":"44700"},{"1":"vector_for_loop(100)","2":"41600"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vectorized_vector(100)","2":"3100"},{"1":"vector_for_loop(100)","2":"41800"},{"1":"vector_for_loop(100)","2":"41900"},{"1":"vectorized_vector(100)","2":"3400"},{"1":"vectorized_vector(100)","2":"3900"},{"1":"vectorized_vector(100)","2":"3000"},{"1":"vectorized_vector(100)","2":"3200"},{"1":"vector_for_loop(100)","2":"41700"},{"1":"vectorized_vector(100)","2":"3200"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Here we use the microbenchmark function to show how many nanoseconds
+are needed to run each function 100 times. We can see that the
+vectorized function is significantly faster than its non-vectorized
+counterpart</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
